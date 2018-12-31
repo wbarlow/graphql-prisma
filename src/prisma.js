@@ -11,6 +11,12 @@ const prisma = new Prisma({
 // prisma.exists
 
 const createPostForUser = async (authorId, data) => {
+    const userExists = await prisma.exists.User({ id: authorId })
+
+    if (!userExists) {
+        throw new Error(`User not found, ${authorId}!`)
+    }
+
     const post = await prisma.mutation.createPost({
         data: {
             ...data,
@@ -20,43 +26,41 @@ const createPostForUser = async (authorId, data) => {
                 }
             }
         }
-    }, '{ id }')
+    }, '{ author { id name email posts { id title published }}}')
     
-    const user = await prisma.query.user({
-        where: {
-            id: authorId
-        }
-    }, '{ id name email posts { id title published } }')
-
-    return user
+    return post.author
 }
 
-// createPostForUser("cjqb1fzp0000c07206mqkp5ay", {
-//     title: 'Some title for this post',
+// createPostForUser("cjqb6tfyi001c0720svt9anme", {
+//     title: 'Some title for this other post',
 //     body: 'some really interesting I thought about today',
 //     published: true
 // }).then((user) => {
 //     console.log(JSON.stringify(user, undefined, 2))
+// }).catch((error) => {
+//     console.log(error.message)
 // })
 
 const updatePostForUser = async (postId, data) => {
+    const postExists = await prisma.exists.Post({ id: postId })
+
+    if (!postExists) {
+        throw new Error(`Post not found, ${postId}!`)
+    }
+
     const post = await prisma.mutation.updatePost({
         where: {
             id: postId
         },
         data
-    }, '{ author { id } }')
+    }, '{ author { id name email posts { id title published } } }')
     
-    const user = await prisma.query.user({
-        where: {
-            id: post.author.id
-        }
-    }, '{ id name email posts { id title published } }')
-
-    return user
+    return post.author
 }
 
 // updatePostForUser("cjqbof4xf002o0720rb3pl9n3", { published: false}).then((user) => {
 //     console.log(JSON.stringify(user, undefined, 2))
+// }).catch((error) => {
+//     console.log(error.message)
 // })
 
