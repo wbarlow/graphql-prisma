@@ -22,6 +22,7 @@ type Mutation {
 
 type Subscription {
     post: PostSubscriptionPayload!
+    myPost: PostSubscriptionPayload!
     comment(postId: ID!): CommentSubscriptionPayload!
 }
 
@@ -44,6 +45,7 @@ input LoginUserInput {
 input UpdateUserInput {
     name: String
     email: String
+    password: String
 }
 
 input CreatePostInput {
