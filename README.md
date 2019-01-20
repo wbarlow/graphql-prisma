@@ -8,3 +8,6 @@ This projects needs several nodejs modules:
 * babel
 * nodemon
 * graphql-cli
+* jwt
+* bcryptjs
+
