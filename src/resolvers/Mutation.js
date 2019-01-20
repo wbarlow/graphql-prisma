@@ -1,14 +1,52 @@
-import uuidv4 from 'uuid/v4'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 const Mutation = {
     async createUser(parent, args, { prisma }, info) {
+        if (args.data.password.length < 8) {
+            throw new Error('Password must be 8 characters or longer.')
+        }
+
         const emailTaken = await prisma.exists.User({ email: args.data.email })
         
         if (emailTaken) {
             throw new Error('Email taken.')
         }
 
-        return prisma.mutation.createUser({ data: args.data }, info)
+        const hashedPassword = await bcrypt.hash(args.data.password, 10)
+        const user = await prisma.mutation.createUser({ 
+            data: {
+                ...args.data, 
+                password: hashedPassword
+            }
+        })
+
+        return  {
+            user,
+            token: jwt.sign({id: user.id}, 'thisisasecret')
+        }
+    },
+    async loginUser(parent, args, { prisma }, info) {
+        const user = await prisma.query.user({
+            where: {
+                email: args.data.email
+            }
+        }) 
+
+        if (!user) {
+            throw new Error("Unable to login")
+        }
+
+        const match = await bcrypt.compare(args.data.password, user.password)
+
+        if (!match) {
+            throw new Error("Unable to login")
+        } 
+
+        return {
+            user,
+            token: jwt.sign({id: user.id}, 'thisisasecret')
+        }
     },
     async deleteUser(parent, args, { prisma }, info) {
         const userExists = await prisma.exists.User({ id: args.id})
@@ -90,7 +128,7 @@ const Mutation = {
             throw new Error('User or Post not found.')
         }
         
-        // need to check if published
+        // TBD: need to check if published
 
         return prisma.mutation.createComment({
             data: {
