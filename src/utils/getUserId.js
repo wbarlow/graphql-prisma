@@ -1,5 +1,4 @@
 import jwt from  'jsonwebtoken'
-import { secret } from './generateToken'
 
 const getUserId = (request, requireAuth = true) => {
     const header = request.request ?
@@ -8,7 +7,7 @@ const getUserId = (request, requireAuth = true) => {
 
     if (header) { 
         const token = header.replace('Bearer ', '')
-        const decoded = jwt.verify(token, String(secret))
+        const decoded = jwt.verify(token, String(process.env.JWT_SECRET))
 
         return decoded.id
     }
