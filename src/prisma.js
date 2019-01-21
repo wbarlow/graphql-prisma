@@ -8,6 +8,7 @@ const prisma = new Prisma({
     fragmentReplacements
 })
 
+
 export { prisma as default }
 
 // prisma.query
