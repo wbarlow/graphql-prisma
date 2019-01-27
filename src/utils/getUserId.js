@@ -5,11 +5,13 @@ const getUserId = (request, requireAuth = true) => {
         request.request.headers.authorization :
         request.connection.context.Authorization
 
+
+
     if (header) { 
         const token = header.replace('Bearer ', '')
         const decoded = jwt.verify(token, String(process.env.JWT_SECRET))
-
-        return decoded.id
+    
+        return decoded.userId
     }
 
     if (requireAuth) {
