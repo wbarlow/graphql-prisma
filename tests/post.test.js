@@ -10,6 +10,7 @@ const client = getClient()
 beforeEach(seedDb)
 
 test('Should expose public posts', async () => {
+    
     const getPosts = gql`
         query {
             posts {
