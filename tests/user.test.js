@@ -9,7 +9,6 @@ const client = getClient()
 
 beforeEach(seedDb)
 
-
 test('Should create a new user', async () => {
     const variables = {
         data: {
@@ -35,7 +34,7 @@ test('Should expose public author profiles', async () => {
         query: getUsers
     })
 
-    expect(response.data.users.length).toBe(1)
+    expect(response.data.users.length).toBe(2)
     expect(response.data.users[0].email).toBe(null)
     expect(response.data.users[0].name).toBe('Jen')
 })
